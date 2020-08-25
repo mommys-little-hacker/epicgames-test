@@ -15,6 +15,7 @@ collectd. We would like to see how you would code this :)
 
 ### Answer
 See [source/q1/poller.sh](source/q1/poller.sh)
+
 This script needs a file containing list of SSH usars and hosts in this format:
 ```
 user0@host0.example.com
