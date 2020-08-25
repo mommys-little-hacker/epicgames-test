@@ -13,6 +13,16 @@ back-end via statsd(TICK, prometheus, statsite) If you are not sure what this is
 use https://github.com/obfuscurity/synthesize. Please do not use an agent such as telegraf or
 collectd. We would like to see how you would code this :)
 
+### Answer
+See [source/q1/poller.sh](source/q1/poller.sh)
+This script needs a file containing list of SSH usars and hosts in this format:
+```
+user0@host0.example.com
+user1@host1.example.com
+```
+Place it in the same directory and name it `hosts.txt`, then run `./poller.sh`
+in this directory.
+
 ## Question 2
 Given the same scenario in question 1, what would you change or consider if you needed to run
 this across 10,000 hosts across multiple regions? Please describe this in detail including how
