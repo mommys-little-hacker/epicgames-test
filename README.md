@@ -36,13 +36,13 @@ Perfectly, I would use a tool designed specifically for that, like telegraf or
 statsite :)
 
 As for the script itself I would have split it two pieces:
-- A [propagetor script](source/q2/propagetor.sh) that takes a list of hosts and
-installs to cron ...
-- A [reporter script](source/q2/reporter.sh) that collects metrics on site and
-reports them directly to backend
+- A [propagator script](source/q2/propagetor.sh) that takes a list of hosts and
+installs to cron...
+- ... a [reporter script](source/q2/reporter.sh) that collects metrics on site
+and reports them directly to backend.
 
-The first script is designed to copy the script and add it to cron in a single
-SSH connection.
+The first script is designed to copy the reporter script and add it to cron in a
+single SSH connection.
 
 ## Question 3
 Given the same scenario from question 2, how do you know the statsd service is
@@ -52,13 +52,13 @@ would use for this monitoring tool.
 Gotchas are an a+.
 
 ### Answer
-Disclaimer: I did not have any experience with statsd in production, so below is
+**Disclaimer**: I did not have any experience with statsd in production, so below is
 what would I do based on common sense and general experience.
 
 First of all I would monitor input/output ratio to avoid message congestion.
 Second, some backends (TICK specifically) can alert if an agent is not sending
 any metrics during some time, but it can be a problem in dynamic environment (e.
-g. VM with statsd has been removed). I would also analyse it's logs with
+g. VM with statsd has been removed). I would also analyse its logs with
 filebeat to see if some messages are being dropped and place alert for serious
 errors.
 
@@ -69,15 +69,15 @@ you discover and monitor that the hosts were in fact running out of memory?
 
 ### Answer
 
-First of all there are several tools to prevent this, specifically earlyoom.
+First of all there are several tools to prevent this, specifically `earlyoom`.
 Also depending on how this OOM occurs it can be visible on memory usage graphs.
 Secondly every OOMkiller engage leaves a log entry in dmesg and syslog, which
 helps to investigate.
 
 As for remediation:
 - Adjust `/proc/$PID/oom_adj` of a process
-- Use tools such as aforementioned earlyoom
-- Add swap or memory (if it is VM or constrained container)
+- Use tools such as aforementioned `earlyoom`
+- Add swap or memory (if it is a VM or a constrained container)
 - Reduce the load on this instance (e. g. lower it's score in load balancer such
 as nginx or haproxy) if applicable
 - Fix the application :)
