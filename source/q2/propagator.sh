@@ -10,6 +10,10 @@ myname=`basename $0`
 # Options
 ###
 
+hostlist="./hosts.txt"
+reporter_script="./reporter.sh"
+cron_interval="* * * * *"
+
 # Path to log file (use stdout to print to terminal)
 log_path="stdout"
 # Redirect output by child processes to log
@@ -32,15 +36,24 @@ LOG_E_ARGS="Invalid arguments supplied."
 # Functions
 ###
 
-orderReport(){
-    remote_login="$1"
-    remote_host="$2"
-    remote_command='mtx=`ps --no-headers -o "pid,%mem" | while read line; do words=($line); echo "${words[0]}:${words[1]}|g"; done`'
+setupHost(){
+    user=${1%%@*}
+    host=${1##*@}
 
-    ssh -l $login $host $remote_command
-}
+    cron_line="$cron_interval bash ~/.reporter.sh"
+    crontab="/var/spool/cron/crontabs/$user"
 
-collectMem(){
+    cat "reporter_script" \
+    | ssh -o 'BatchMode=yes' "$user"@"$host" \
+        cat > ~/.reporter.sh \
+        ';' grep "$cron_line" "$crontab" \
+        '||' echo "$cron_line" '>>' "$crontab"
+    if [[ $? = 0 ]]
+    then
+        logEvent "Host $host has been set up successfully"
+    else
+        logEvent "Failed to set host $host up"
+    fi
 }
 
 logEvent() {
@@ -81,6 +94,12 @@ fi
 # main()
 ###
 
-# Start your code here
+[ -f "$hostlist" ] || errorExit 1 "Could not find host list"
+[ -f "$reporter_script" ] || errorExit 1 "Could not find reporter script"
+
+while read hostline
+do
+    setupHost $hostline &
+done < "$hostlist"
 
 exit 0
